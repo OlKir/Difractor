@@ -4,6 +4,7 @@
 	import flash.events.Event;
 	import flash.filesystem.File;
 	import model.ImageLibrary;
+	import model.UserSettings;
 	
 	public class ControlsViewController {
 		
@@ -21,6 +22,15 @@
 			this.controlsView = controlsView as ControlsView;
 			this.controlsView.linkUIElements();
 			this.controlsView.delegate = this;
+			this.controlsView.enableImageControls(false);
+			
+			var imageLibraryPath:String = UserSettings.loadWorkingPath();
+			if (imageLibraryPath != null) {
+				this.controlsView.enabled = false;
+				this.controlsView.libraryPath.text = imageLibraryPath;
+				var imageLibraryFolder:File = new File(imageLibraryPath);
+				this.imageLibrary.reloadLibrary(imageLibraryFolder,this.controlsView.libraryGrid.columnWidth,this.controlsView.libraryGrid.rowHeight);
+			}
 		}
 		
 		public function updateDisplay()
@@ -28,14 +38,13 @@
 			this.controlsView.setDefaultParameters();
 		}
 		
-
-		
-		
-		
 		function folder_selected(e:Event):void
 		{
+			this.controlsView.enabled = false;
 			this.controlsView.libraryPath.text = File(e.currentTarget).nativePath;
-			this.imageLibrary.reloadLibrary(File(e.currentTarget),this.controlsView.libraryGrid.columnWidth,this.controlsView.libraryGrid.rowHeight);
+			if (this.imageLibrary.reloadLibrary(File(e.currentTarget),this.controlsView.libraryGrid.columnWidth,this.controlsView.libraryGrid.rowHeight)) {
+				UserSettings.saveWorkingPath(File(e.currentTarget).nativePath);
+			}
 			
 		}
 		
@@ -51,6 +60,7 @@
 			if (this.imageLibrary.images.length > MAX_IMAGES_WITHOUT_SCROLLING) {
 				this.controlsView.libraryGrid.width = 322;
 			}
+			this.controlsView.enabled = true;
 		}
 		
 		// ControlsView delegate methods
@@ -64,6 +74,7 @@
 		
 		public function updateButtonClicked():void
 		{
+			this.controlsView.enabled = false;
 			this.controlsView.libraryGrid.removeAll();
 			this.imageLibrary.reloadLibrary(null,this.controlsView.libraryGrid.columnWidth,this.controlsView.libraryGrid.rowHeight,true);
 		}
