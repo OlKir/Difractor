@@ -32,6 +32,8 @@
 		var browseBTN:Button;
 		var updateBTN:Button;
 		
+		var selectColorBTN:Sprite;
+		
 		var imageControls:Vector.<UIComponent>;
 	
 		public function ControlsView() {
@@ -50,9 +52,11 @@
 			this.applyHorisontalBTN = this.getChildByName("apply_horisontal_btn_") as Button;
 			this.applyVerticalBTN = this.getChildByName("apply_vertical_btn_") as Button;
 
+			this.selectColorBTN = this.getChildByName("select_color_btn_") as Sprite;
+			this.selectColorBTN.addEventListener(MouseEvent.CLICK,selectColorButtonDidClicked);
+			
 			this.saveImageBTN = this.getChildByName("save_image_btn_") as Button;
-
-
+			
 			this.browseBTN = this.getChildByName("browse_btn_") as Button;
 			this.browseBTN.addEventListener(MouseEvent.MOUSE_UP,browseButtonDidClicked);
 			this.libraryPath = this.getChildByName("library_path_") as TextInput;
@@ -95,8 +99,15 @@
 			if (! this.enabled) {
 				return;
 			}
-			
 			this.delegate.updateButtonClicked();
+		}
+		
+		function selectColorButtonDidClicked(e:MouseEvent):void
+		{
+			if (! this.enabled) {
+				return;
+			}
+			this.delegate.selectColorButtonClicked();
 		}
 
 	}

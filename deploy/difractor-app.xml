@@ -18,9 +18,11 @@
     <renderMode>auto</renderMode>
     <width>1366</width>
     <height>768</height>
-    <maximizable>true</maximizable>
-    <minimizable>true</minimizable>
-    <resizable>true</resizable>
+    <maximizable>false</maximizable>
+    <minimizable>false</minimizable>
+    <resizable>false</resizable>
+    <minSize>1366 768</minSize>
+    <maxSize>1366 768</maxSize>
   </initialWindow>
   <icon>
     <image16x16>AppIconsForPublish/icon_16.png</image16x16>

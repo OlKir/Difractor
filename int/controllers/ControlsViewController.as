@@ -5,13 +5,18 @@
 	import flash.filesystem.File;
 	import model.ImageLibrary;
 	import model.UserSettings;
+	import views.ColorPickerView;
 	
 	public class ControlsViewController {
 		
-		const MAX_IMAGES_WITHOUT_SCROLLING:int = 15;
+		const CONTROL_PANEL_WIDTH:Number = 342;
+		const CONTROL_PANEL_PADDING:Number = 10;
 		
 		var controlsView:ControlsView;
 		var imageLibrary:ImageLibrary;
+		
+		var fader:Sprite;
+		var colorPicker:ColorPickerView;
 
 		public function ControlsViewController(controlsView:Sprite, imageLibrary:ImageLibrary)
 		{
@@ -23,6 +28,14 @@
 			this.controlsView.linkUIElements();
 			this.controlsView.delegate = this;
 			this.controlsView.enableImageControls(false);
+			
+			this.fader = this.controlsView.getChildByName("controls_fader_") as Sprite;
+			this.fader.visible = false;
+			
+			this.colorPicker = this.controlsView.getChildByName("color_picker_") as ColorPickerView;
+			this.colorPicker.linkUIElements();
+			this.colorPicker.visible = false;
+			this.colorPicker.delegate = this;
 			
 			var imageLibraryPath:String = UserSettings.loadWorkingPath();
 			if (imageLibraryPath != null) {
@@ -57,9 +70,7 @@
 			for each (var imageMedia in this.imageLibrary.images) {
 				this.controlsView.libraryGrid.addItem({objectId:imageMedia.objId,source:this.imageLibrary.thumbnailPath(imageMedia)});
 			}
-			if (this.imageLibrary.images.length > MAX_IMAGES_WITHOUT_SCROLLING) {
-				this.controlsView.libraryGrid.width = 322;
-			}
+
 			this.controlsView.enabled = true;
 		}
 		
@@ -77,6 +88,23 @@
 			this.controlsView.enabled = false;
 			this.controlsView.libraryGrid.removeAll();
 			this.imageLibrary.reloadLibrary(null,this.controlsView.libraryGrid.columnWidth,this.controlsView.libraryGrid.rowHeight,true);
+		}
+		
+		public function selectColorButtonClicked():void
+		{
+			this.fader.visible = true;
+			this.fader.x = 0;
+			
+			this.colorPicker.visible = true;
+			this.colorPicker.x = -CONTROL_PANEL_WIDTH/2;
+		}
+		
+		// ColorPickerView delegate methods
+		
+		public function pickerViewClosed():void
+		{
+			this.fader.visible = false;			
+			this.colorPicker.visible = false;
 		}
 		
 	}
