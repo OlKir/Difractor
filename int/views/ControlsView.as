@@ -8,6 +8,7 @@
 	import fl.controls.TileList;
 	import controllers.ControlsViewController;
 	import fl.core.UIComponent;
+	import flash.display.Shape;
 
 	public class ControlsView extends Sprite {
 		
@@ -33,6 +34,9 @@
 		var updateBTN:Button;
 		
 		var selectColorBTN:Sprite;
+		var selectedForeground:Sprite;
+		var selectedBackground:Sprite;
+		var selectedBackgroundColorExample:Shape;
 		
 		var imageControls:Vector.<UIComponent>;
 	
@@ -54,6 +58,10 @@
 
 			this.selectColorBTN = this.getChildByName("select_color_btn_") as Sprite;
 			this.selectColorBTN.addEventListener(MouseEvent.CLICK,selectColorButtonDidClicked);
+			this.selectedForeground = this.getChildByName("selected_foreground_") as Sprite;
+			this.selectedBackground = this.getChildByName("selected_background_") as Sprite;
+			this.selectedBackgroundColorExample = new Shape();
+			this.selectedBackground.addChild(this.selectedBackgroundColorExample);
 			
 			this.saveImageBTN = this.getChildByName("save_image_btn_") as Button;
 			
@@ -86,6 +94,14 @@
 			}
 		}
 		
+		public function updateBackgroundColor(color:uint):void
+		{
+			this.selectedBackgroundColorExample.graphics.beginFill(color,1.0);
+			this.selectedBackgroundColorExample.graphics.drawRect(0,0,this.selectedBackground.width,this.selectedBackground.height);
+			this.selectedBackgroundColorExample.graphics.endFill();
+		}
+
+		
 		function browseButtonDidClicked(e:MouseEvent):void
 		{
 			if (! this.enabled) {
@@ -109,6 +125,7 @@
 			}
 			this.delegate.selectColorButtonClicked();
 		}
+		
 
 	}
 	

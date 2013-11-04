@@ -9,6 +9,8 @@
 	
 	public class ControlsViewController {
 		
+		public static const EMPTY_COLOR:uint = 0xff000000;
+		
 		const CONTROL_PANEL_WIDTH:Number = 342;
 		const CONTROL_PANEL_PADDING:Number = 10;
 		
@@ -97,6 +99,7 @@
 			
 			this.colorPicker.visible = true;
 			this.colorPicker.x = -CONTROL_PANEL_WIDTH/2;
+			this.colorPicker.choosenColor = EMPTY_COLOR;
 		}
 		
 		// ColorPickerView delegate methods
@@ -105,6 +108,9 @@
 		{
 			this.fader.visible = false;			
 			this.colorPicker.visible = false;
+			if (this.colorPicker.choosenColor != EMPTY_COLOR) {
+				this.controlsView.updateBackgroundColor(this.colorPicker.choosenColor);
+			}
 		}
 		
 	}
