@@ -48,6 +48,17 @@
 			this.maskView.height = maskRectangle.height;
 		}
 		
+		function placeFullImage(e:Event):void
+		{
+			var foregroundImageBitmap:BitmapData = this.imageLibrary.getFullImageById(this.foregroundImageId);
+			if (foregroundImageBitmap == null) {
+				return;
+			}
+			this.foregroundImage = new Bitmap(foregroundImageBitmap);
+			this.foregroundView.addChild(this.foregroundImage);
+			dispatchEvent(new Event(CanvasViewController.FULL_IMAGE_ACCEPTED));
+		}
+		
 		
 		// ControlsViewController delegate
 		
@@ -77,16 +88,21 @@
 			this.imageLibrary.loadFullImageById(this.foregroundImageId,oldId);
 		}
 		
-		function placeFullImage(e:Event):void
+		public function setRelativeScale(relative:Boolean):void
 		{
-			var foregroundImageBitmap:BitmapData = this.imageLibrary.getFullImageById(this.foregroundImageId);
-			if (foregroundImageBitmap == null) {
+			if (! relative) {
+				this.foregroundImage.scaleX = 1.0;
+				this.foregroundImage.scaleY = 1.0;
 				return;
 			}
-			this.foregroundImage = new Bitmap(foregroundImageBitmap);
-			this.foregroundView.addChild(this.foregroundImage);
-			dispatchEvent(new Event(CanvasViewController.FULL_IMAGE_ACCEPTED));
+			var oldWidth:Number = this.foregroundImage.width;
+			var oldHeight:Number = this.foregroundImage.height;
+			this.foregroundImage.width = this.maskView.width;
+			this.foregroundImage.height = oldHeight * this.foregroundImage.width / oldWidth;
+			
 		}
+		
+
 
 	}
 	

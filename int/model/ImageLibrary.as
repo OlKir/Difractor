@@ -73,6 +73,19 @@
 			return true;
 		}
 		
+		public function newMediaName(objectId:int):String
+		{
+			var mediaName:String = "untitled.png";
+			for each (var image:ImageMedia in this.images) {
+				if (image.objId == objectId) {
+					mediaName = image.fileLink.name;
+					var mediaExtension:String = image.fileLink.extension;
+					mediaName = mediaName.substr(0,mediaName.length - mediaExtension.length - 1) + "_.png";
+				}
+			}
+			return mediaName;
+		}
+		
 		public function thumbnailPath(image:ImageMedia):String
 		{
 			return this.cacheFolder.nativePath + File.separator + image.thumbnailName;

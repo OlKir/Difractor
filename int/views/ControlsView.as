@@ -13,6 +13,7 @@
 	import flash.geom.Point;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.events.Event;
 
 	public class ControlsView extends Sprite {
 		
@@ -20,6 +21,7 @@
 		public var libraryPath:TextInput;
 		public var libraryGrid:TileList;
 		public var enabled:Boolean;
+		public var fileName:TextInput;
 		
 		var preselectedPhotoIndex:int;
 		
@@ -33,6 +35,7 @@
 		var applyHorisontalBTN:Button;
 		
 		var applyVerticalBTN:Button;
+		
 		
 		var saveImageBTN:Button;
 		
@@ -56,7 +59,9 @@
 		public function linkUIElements():void
 		{
 			this.currentScaleRB = this.getChildByName("current_scale_rb_") as RadioButton;
+			this.currentScaleRB.addEventListener(Event.CHANGE,scaleDidChanged);
 			this.realScaleRB = this.getChildByName("real_scale_rb_") as RadioButton;
+			this.realScaleRB.addEventListener(Event.CHANGE,scaleDidChanged);
 			
 			this.horOffset =  this.getChildByName("hor_offset_") as TextInput;
 			this.horStep =  this.getChildByName("hor_step_") as TextInput;
@@ -72,6 +77,7 @@
 			this.selectedBackgroundColorExample = new Shape();
 			this.selectedBackground.addChild(this.selectedBackgroundColorExample);
 			
+			this.fileName = this.getChildByName("file_name_") as TextInput;
 			this.saveImageBTN = this.getChildByName("save_image_btn_") as Button;
 			
 			this.browseBTN = this.getChildByName("browse_btn_") as Button;
@@ -91,7 +97,6 @@
 		
 		public function setDefaultParameters():void
 		{
-			this.currentScaleRB.label = "0%";
 			this.horOffset.text = "";
 			this.horStep.text = "";
 			this.horWidth.text = "";
@@ -162,7 +167,16 @@
 		
 		function selectPhoto(e:MouseEvent):void
 		{
-			this.delegate.photoPicked(libraryGrid.getItemAt(this.preselectedPhotoIndex).objectId);
+			this.delegate.photoPicked(this.libraryGrid.getItemAt(this.preselectedPhotoIndex).objectId);
+		}
+		
+		function scaleDidChanged(e:Event):void
+		{
+			if (e.target == this.currentScaleRB && this.currentScaleRB.selected) {
+				this.delegate.setRelativeScale(true);
+				return;
+			}
+			this.delegate.setRelativeScale(false);
 		}
 
 	}

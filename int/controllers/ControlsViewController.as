@@ -98,10 +98,17 @@
 			var targetPoint:Point = new Point(this.selectedPhotoCursor.x,this.selectedPhotoCursor.y);
 			if (this.controlsView.pointInForegroundControl(targetPoint)) {
 				this.controlsView.setForegroundImage(this.selectedPhoto.bitmapData);
+				this.setArtworkNameFor(this.selectedPhotoId);
 				this.delegate.setForegroundImage(this.selectedPhotoId);
 			}
 			this.selectedPhoto = null;
 			this.selectedPhotoCursor = null;
+		}
+		
+		function setArtworkNameFor(objectId:int):void
+		{
+			var fileName:String = this.imageLibrary.newMediaName(objectId);
+			this.controlsView.fileName.text = fileName;
 		}
 		
 		// ControlsView delegate methods
@@ -148,6 +155,14 @@
 			this.selectedPhotoCursor.addEventListener(MouseEvent.MOUSE_UP,dropPhoto);
 			this.controlsView.addChild(this.selectedPhotoCursor);
 			this.selectedPhotoCursor.startDrag();
+		}
+		
+		public function setRelativeScale(relative:Boolean):void
+		{
+			if (this.delegate == null) {
+				return;
+			}
+			this.delegate.setRelativeScale(relative);
 		}
 		
 		// ColorPickerView delegate methods
