@@ -15,6 +15,8 @@
 		
 		public static const EMPTY_COLOR:uint = 0xff000000;
 		
+		public var delegate:CanvasViewController;
+		
 		const CONTROL_PANEL_WIDTH:Number = 342;
 		const CONTROL_PANEL_PADDING:Number = 10;
 		
@@ -25,6 +27,7 @@
 		var colorPicker:ColorPickerView;
 		
 		var selectedPhoto:Bitmap;
+		var selectedPhotoId:int;
 		var selectedPhotoCursor:Sprite;
 
 		public function ControlsViewController(controlsView:Sprite, imageLibrary:ImageLibrary)
@@ -60,6 +63,11 @@
 			this.controlsView.setDefaultParameters();
 		}
 		
+		public function unlockImageControls():void
+		{
+			this.controlsView.enableImageControls(true);
+		}
+		
 		function folder_selected(e:Event):void
 		{
 			this.controlsView.enabled = false;
@@ -90,6 +98,7 @@
 			var targetPoint:Point = new Point(this.selectedPhotoCursor.x,this.selectedPhotoCursor.y);
 			if (this.controlsView.pointInForegroundControl(targetPoint)) {
 				this.controlsView.setForegroundImage(this.selectedPhoto.bitmapData);
+				this.delegate.setForegroundImage(this.selectedPhotoId);
 			}
 			this.selectedPhoto = null;
 			this.selectedPhotoCursor = null;
@@ -128,6 +137,7 @@
 				return;
 			}
 			this.selectedPhotoCursor = new Sprite();
+			this.selectedPhotoId = objectId;
 
 			this.selectedPhotoCursor.addChild(selectedPhoto);
 			this.selectedPhoto.x = - this.selectedPhotoCursor.width/2;
@@ -148,6 +158,7 @@
 			this.colorPicker.visible = false;
 			if (this.colorPicker.choosenColor != EMPTY_COLOR) {
 				this.controlsView.updateBackgroundColor(this.colorPicker.choosenColor);
+				this.delegate.setBackgroundColor(this.colorPicker.choosenColor);
 			}
 		}
 		

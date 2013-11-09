@@ -10,7 +10,8 @@
 	public class ImageLibrary extends EventDispatcher  {
 		
 		public static const LIBRARY_READY = "LIBRARY_READY";
-		
+		public static const FULL_IMAGE_LOADED = "FULL_IMAGE_LOADED";
+
 		public var images:Vector.<ImageMedia>;
 		
 		
@@ -85,6 +86,44 @@
 				}
 			}
 			return null;
+		}
+		
+		// loadFullImageById should preload image first
+		public function getFullImageById(objectId:int):BitmapData
+		{
+			for each (var image:ImageMedia in this.images) {
+				if (image.objId == objectId) {
+					if (image.mediaSource == null) {
+						trace("ERROR: You should load full image first with loadFullImageById!!!");
+					}
+					return image.mediaSource;
+				}
+			}
+			return null;
+		}
+		
+		// oldObjectId can be CanvasViewController.NO_IMAGE
+		public function loadFullImageById(objectId:int,oldObjectId:int):void
+		{
+			for each (var image:ImageMedia in this.images) {
+
+				if (image.objId == objectId) {
+					image.loadImageCompletely();
+					image.addEventListener(ImageMedia.FULL_IMAGE_READY,returnFullImage);
+				}
+				
+				if (image.objId == oldObjectId) {
+					trace("trying to unload: "+oldObjectId);
+					image.unloadSourceImage();
+				}
+			}
+		}
+		
+
+		
+		function returnFullImage(e:Event):void
+		{
+			dispatchEvent(new Event(ImageLibrary.FULL_IMAGE_LOADED));
 		}
 		
 		function checkLoading(e:TimerEvent):void

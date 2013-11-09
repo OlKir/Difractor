@@ -25,6 +25,8 @@
 
 
 	public class ImageMedia extends EventDispatcher {
+		
+		public static const FULL_IMAGE_READY = "FULLIMAGE_READY";
 	
 		public var mediaThumbnail:BitmapData;
 		public var mediaSource:BitmapData;
@@ -120,7 +122,7 @@
 				this.sourceLoading = false;
 				mediaContent = Bitmap(mediaLoader.content);
 				this.mediaSource = mediaContent.bitmapData;
-				this.sourceLoaded = true;
+				dispatchEvent(new Event(FULL_IMAGE_READY));
 				return;
 			}
 			

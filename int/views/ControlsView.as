@@ -103,6 +103,7 @@
 			for each (var control:UIComponent in this.imageControls) {
 				control.enabled = switchState;
 			}
+			this.realScaleRB.selected = true;
 		}
 		
 		public function updateBackgroundColor(color:uint):void
