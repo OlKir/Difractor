@@ -6,6 +6,10 @@
 	import model.ImageLibrary;
 	import model.UserSettings;
 	import views.ColorPickerView;
+	import flash.display.Bitmap;
+	import flash.events.MouseEvent;
+	import flash.geom.Point;
+	import flash.ui.Mouse;
 	
 	public class ControlsViewController {
 		
@@ -19,6 +23,9 @@
 		
 		var fader:Sprite;
 		var colorPicker:ColorPickerView;
+		
+		var selectedPhoto:Bitmap;
+		var selectedPhotoCursor:Sprite;
 
 		public function ControlsViewController(controlsView:Sprite, imageLibrary:ImageLibrary)
 		{
@@ -76,6 +83,18 @@
 			this.controlsView.enabled = true;
 		}
 		
+		function dropPhoto(e:MouseEvent):void
+		{
+			this.selectedPhotoCursor.stopDrag();
+			this.controlsView.removeChild(this.selectedPhotoCursor);
+			var targetPoint:Point = new Point(this.selectedPhotoCursor.x,this.selectedPhotoCursor.y);
+			if (this.controlsView.pointInForegroundControl(targetPoint)) {
+				this.controlsView.setForegroundImage(this.selectedPhoto.bitmapData);
+			}
+			this.selectedPhoto = null;
+			this.selectedPhotoCursor = null;
+		}
+		
 		// ControlsView delegate methods
 		
 		public function browseButtonClicked():void
@@ -100,6 +119,25 @@
 			this.colorPicker.visible = true;
 			this.colorPicker.x = -CONTROL_PANEL_WIDTH/2;
 			this.colorPicker.choosenColor = EMPTY_COLOR;
+		}
+		
+		public function photoPicked(objectId:int):void
+		{
+			this.selectedPhoto = new Bitmap(this.imageLibrary.getThumbnailById(objectId));
+			if (this.selectedPhoto == null) {
+				return;
+			}
+			this.selectedPhotoCursor = new Sprite();
+
+			this.selectedPhotoCursor.addChild(selectedPhoto);
+			this.selectedPhoto.x = - this.selectedPhotoCursor.width/2;
+			this.selectedPhoto.y = - this.selectedPhotoCursor.height/2;
+			
+			this.selectedPhotoCursor.x = this.controlsView.mouseX;
+			this.selectedPhotoCursor.y = this.controlsView.mouseY;
+			this.selectedPhotoCursor.addEventListener(MouseEvent.MOUSE_UP,dropPhoto);
+			this.controlsView.addChild(this.selectedPhotoCursor);
+			this.selectedPhotoCursor.startDrag();
 		}
 		
 		// ColorPickerView delegate methods

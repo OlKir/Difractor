@@ -9,6 +9,10 @@
 	import controllers.ControlsViewController;
 	import fl.core.UIComponent;
 	import flash.display.Shape;
+	import fl.events.ListEvent;
+	import flash.geom.Point;
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 
 	public class ControlsView extends Sprite {
 		
@@ -16,6 +20,8 @@
 		public var libraryPath:TextInput;
 		public var libraryGrid:TileList;
 		public var enabled:Boolean;
+		
+		var preselectedPhotoIndex:int;
 		
 		// GUI elements
 		var currentScaleRB:RadioButton;
@@ -35,8 +41,11 @@
 		
 		var selectColorBTN:Sprite;
 		var selectedForeground:Sprite;
+		var selectedForegroundImage:Bitmap;
 		var selectedBackground:Sprite;
 		var selectedBackgroundColorExample:Shape;
+		
+ 
 		
 		var imageControls:Vector.<UIComponent>;
 	
@@ -72,6 +81,8 @@
 			this.updateBTN.addEventListener(MouseEvent.MOUSE_UP,updateButtonDidClicked);
 			
 			this.libraryGrid = this.getChildByName("library_grid_") as TileList;
+			this.libraryGrid.addEventListener(ListEvent.ITEM_ROLL_OVER,preselectPhoto);
+			this.libraryGrid.addEventListener(MouseEvent.MOUSE_DOWN,selectPhoto);
 			
 			this.imageControls = new <UIComponent>[this.currentScaleRB,this.realScaleRB,this.applyHorisontalBTN,this.saveImageBTN];
 			
@@ -100,7 +111,24 @@
 			this.selectedBackgroundColorExample.graphics.drawRect(0,0,this.selectedBackground.width,this.selectedBackground.height);
 			this.selectedBackgroundColorExample.graphics.endFill();
 		}
-
+		
+		public function pointInForegroundControl(targetPoint:Point):Boolean
+		{
+			if (this.selectedForeground.getBounds(this).containsPoint(targetPoint)) {
+				return true;
+			}
+			return false;
+		}
+		
+		public function setForegroundImage(imageBitmap:BitmapData):void
+		{
+			if (this.selectedForegroundImage != null) {
+				this.selectedForeground.removeChild(this.selectedForegroundImage);
+				this.selectedForegroundImage = null;
+			}
+			this.selectedForegroundImage = new Bitmap(imageBitmap);
+			this.selectedForeground.addChild(this.selectedForegroundImage);
+		}
 		
 		function browseButtonDidClicked(e:MouseEvent):void
 		{
@@ -126,6 +154,15 @@
 			this.delegate.selectColorButtonClicked();
 		}
 		
+		function preselectPhoto(e:ListEvent):void
+		{
+			this.preselectedPhotoIndex = e.index;
+		}
+		
+		function selectPhoto(e:MouseEvent):void
+		{
+			this.delegate.photoPicked(libraryGrid.getItemAt(this.preselectedPhotoIndex).objectId);
+		}
 
 	}
 	

@@ -5,6 +5,7 @@
 	import flash.events.TimerEvent;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.display.BitmapData;
 	
 	public class ImageLibrary extends EventDispatcher  {
 		
@@ -74,6 +75,16 @@
 		public function thumbnailPath(image:ImageMedia):String
 		{
 			return this.cacheFolder.nativePath + File.separator + image.thumbnailName;
+		}
+		
+		public function getThumbnailById(objectId:int):BitmapData
+		{
+			for each (var image:ImageMedia in this.images) {
+				if (image.objId == objectId) {
+					return image.mediaThumbnail;
+				}
+			}
+			return null;
 		}
 		
 		function checkLoading(e:TimerEvent):void
