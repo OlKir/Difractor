@@ -169,6 +169,12 @@
 		
 		function selectPhoto(e:MouseEvent):void
 		{
+			var mousePosition:Point = new Point(e.stageX,e.stageY);
+			mousePosition = this.libraryGrid.globalToLocal(mousePosition);
+			trace(mousePosition.x + " " + this.libraryGrid.columnCount * this.libraryGrid.columnWidth);
+			if (mousePosition.x > this.libraryGrid.columnCount * this.libraryGrid.columnWidth) {
+				return;
+			}
 			this.delegate.photoPicked(this.libraryGrid.getItemAt(this.preselectedPhotoIndex).objectId);
 		}
 		
