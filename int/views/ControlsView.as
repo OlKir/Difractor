@@ -68,6 +68,7 @@
 			this.horWidth =  this.getChildByName("hor_width_") as TextInput;
 			
 			this.applyHorisontalBTN = this.getChildByName("apply_horisontal_btn_") as Button;
+			this.applyHorisontalBTN.addEventListener(MouseEvent.CLICK,applyHorisontalSlices);
 			this.applyVerticalBTN = this.getChildByName("apply_vertical_btn_") as Button;
 
 			this.selectColorBTN = this.getChildByName("select_color_btn_") as Sprite;
@@ -177,6 +178,11 @@
 				return;
 			}
 			this.delegate.setRelativeScale(false);
+		}
+		
+		function applyHorisontalSlices(e:MouseEvent):void
+		{
+			this.delegate.applyHorisontalSlices(this.horOffset.text,this.horWidth.text,this.horStep.text);
 		}
 
 	}

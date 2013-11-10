@@ -165,12 +165,28 @@
 			this.delegate.setRelativeScale(relative);
 		}
 		
+		public function applyHorisontalSlices(sliceOffsetString:String,sliceWidthString:String,sliceStepString:String):void
+		{
+			var sliceOffset:int = int(sliceOffsetString);
+			var sliceWidth:int = int(sliceWidthString);
+			var sliceStep:int = int(sliceStepString);
+			if (sliceWidth == 0 || sliceStep == 0) {
+				sliceWidth = CanvasViewController.NOT_DEFINED;
+			}
+			this.delegate.applyHorisontalSlicing(sliceOffset,sliceWidth,sliceStep);
+		}
+		
 		// ColorPickerView delegate methods
 		
 		public function pickerViewClosed():void
 		{
 			this.fader.visible = false;			
 			this.colorPicker.visible = false;
+			this.pickerViewUpdatedColor();
+		}
+		
+		public function pickerViewUpdatedColor():void
+		{
 			if (this.colorPicker.choosenColor != EMPTY_COLOR) {
 				this.controlsView.updateBackgroundColor(this.colorPicker.choosenColor);
 				this.delegate.setBackgroundColor(this.colorPicker.choosenColor);

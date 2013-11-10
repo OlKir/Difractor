@@ -71,6 +71,12 @@
 	
 		function closeButtonDidClicked(e:MouseEvent):void
 		{
+			this.createOutputColor();
+			this.delegate.pickerViewClosed();
+		}
+		
+		function createOutputColor():void
+		{
 			if (this.redInput.text.length > 0 && this.greenInput.text.length > 0 && this.blueInput.text.length) {
 				var red:uint = parseInt(this.redInput.text);
 				var green:uint = parseInt(this.greenInput.text);
@@ -81,7 +87,6 @@
 				
 				this._choosenColor = red << 16 | green << 8 | blue;
 			}
-			this.delegate.pickerViewClosed();
 		}
 		
 		function movePickerCursor(e:MouseEvent):void
@@ -102,6 +107,9 @@
 			paletteData.draw(this.colorPalette);
 			this.pickerCursor.visible = true;
 			this.choosenColor = paletteData.getPixel32(e.localX,e.localY);
+			
+			this.createOutputColor();
+			this.delegate.pickerViewUpdatedColor();
 		}
 		
 		function showPickerCursor(e:MouseEvent):void

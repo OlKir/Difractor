@@ -126,7 +126,6 @@
 				}
 				
 				if (image.objId == oldObjectId) {
-					trace("trying to unload: "+oldObjectId);
 					image.unloadSourceImage();
 				}
 			}

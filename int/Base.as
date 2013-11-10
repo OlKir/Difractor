@@ -12,6 +12,8 @@
 		var imageLibrary:ImageLibrary;
 		var canvasViewController:CanvasViewController;
 		
+		var firstPhotoSelected:Boolean;
+		
 		public function Base() {
 			this.imageLibrary = new ImageLibrary();
 			
@@ -25,6 +27,10 @@
 		
 		function unlockControls(e:Event):void
 		{
+			if (this.firstPhotoSelected) {
+				return;
+			}
+			this.firstPhotoSelected = true;
 			this.controlsViewController.unlockImageControls();
 		}
 	}

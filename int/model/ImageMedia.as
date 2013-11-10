@@ -96,6 +96,7 @@
 		
 		public function unloadSourceImage():void
 		{
+			this.mediaSource.dispose();
 			this.mediaSource = null;
 			this.mediaLoader.unloadAndStop();
 			this.mediaLoader = null;
