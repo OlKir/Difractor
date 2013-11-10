@@ -80,6 +80,7 @@
 			
 			this.fileName = this.getChildByName("file_name_") as TextInput;
 			this.saveImageBTN = this.getChildByName("save_image_btn_") as Button;
+			this.saveImageBTN.addEventListener(MouseEvent.CLICK,saveImagePressed);
 			
 			this.browseBTN = this.getChildByName("browse_btn_") as Button;
 			this.browseBTN.addEventListener(MouseEvent.MOUSE_UP,browseButtonDidClicked);
@@ -183,6 +184,11 @@
 		function applyHorisontalSlices(e:MouseEvent):void
 		{
 			this.delegate.applyHorisontalSlices(this.horOffset.text,this.horWidth.text,this.horStep.text);
+		}
+		
+		function saveImagePressed(e:MouseEvent):void
+		{
+			this.delegate.saveImage(this.fileName.text);
 		}
 
 	}

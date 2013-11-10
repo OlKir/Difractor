@@ -16,6 +16,8 @@
 		
 		
 		const CACHE_FOLDER_NAME = "temp";
+		const OUTPUT_FOLDER_NAME = "output";
+		
 		var loadingCheckTimer:Timer;
 		var updateCache:Boolean;
 		var libraryFolder:File;
@@ -71,6 +73,17 @@
 			this.loadingCheckTimer.start();
 			
 			return true;
+		}
+		
+		public function saveImageWithName(imageName:String,fileData:BitmapData):void
+		{
+			var fileName:String = imageName.toLocaleLowerCase();
+			if (imageName.substr(-4,4) != ".png") {
+				fileName += ".png";
+			}
+			var outputFile:File = this.libraryFolder.resolvePath(OUTPUT_FOLDER_NAME);
+			outputFile = outputFile.resolvePath(fileName);
+			ImageMedia.saveDataToPNG(fileData,outputFile);
 		}
 		
 		public function newMediaName(objectId:int):String

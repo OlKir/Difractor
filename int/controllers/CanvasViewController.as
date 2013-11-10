@@ -169,6 +169,24 @@
 			this.updateScale();	
 			this.updateBackgroundColor();
 		}
+		
+		public function saveCurrentImageWithName(imageName:String):void
+		{
+			this.foregroundImage.scaleX = 1.0;
+			this.foregroundImage.scaleY = 1.0;
+			this.canvasView.mask = null;
+			this.updateBackgroundColor();
+			
+			var resultImageBitmap:BitmapData = new BitmapData(this.foregroundImage.width,this.foregroundImage.height,false,0xffffff);
+			resultImageBitmap.draw(this.canvasView);
+			
+			this.updateScale();
+			this.updateBackgroundColor();
+			this.canvasView.mask = this.maskView;
+			
+			this.imageLibrary.saveImageWithName(imageName,resultImageBitmap);
+			resultImageBitmap.dispose();
+		}
 	}
 	
 }

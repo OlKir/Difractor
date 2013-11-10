@@ -176,6 +176,11 @@
 			this.delegate.applyHorisontalSlicing(sliceOffset,sliceWidth,sliceStep);
 		}
 		
+		public function saveImage(imageName:String):void
+		{
+			this.delegate.saveCurrentImageWithName(imageName);
+		}
+		
 		// ColorPickerView delegate methods
 		
 		public function pickerViewClosed():void

@@ -61,16 +61,23 @@
 			this.sourceLoaded = false;
 		}
 		
+		public static function saveDataToPNG(imageData:BitmapData,targetFile:File):void
+		{
+			var pngData = PNGEncoder.encode(imageData);
+			var fileStream:FileStream = new FileStream();
+			try {
+				fileStream.open(targetFile, FileMode.WRITE);
+				fileStream.writeBytes(pngData);
+				fileStream.close();
+			} catch (e:Error) {
+				trace("ERROR: Can't write to file: "+targetFile.nativePath);
+			}
+		}
+		
 		public function cacheThumbnail(cacheFolder:File):void
 		{
-			var pngData = PNGEncoder.encode(this.mediaThumbnail);
-			
 			var resultFile:File = cacheFolder.resolvePath(this.thumbnailName);
-			var fileStream:FileStream = new FileStream();
-			fileStream.open(resultFile, FileMode.WRITE);
-			fileStream.writeBytes(pngData);
-			fileStream.close();
-			
+			ImageMedia.saveDataToPNG(this.mediaThumbnail,resultFile);
 		}
 		
 		public function loadThumbnailFromCachedFile(cachedFile:File = null):void
