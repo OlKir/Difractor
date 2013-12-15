@@ -46,9 +46,8 @@
 		var selectedForeground:Sprite;
 		var selectedForegroundImage:Bitmap;
 		var selectedBackground:Sprite;
+		var selectedBackgroundImage:Bitmap;
 		var selectedBackgroundColorExample:Shape;
-		
- 
 		
 		var imageControls:Vector.<UIComponent>;
 	
@@ -128,6 +127,14 @@
 			return false;
 		}
 		
+		public function pointInBackgroundControl(targetPoint:Point):Boolean
+		{
+			if (this.selectedBackground.getBounds(this).containsPoint(targetPoint)) {
+				return true;
+			}
+			return false;
+		}
+		
 		public function setForegroundImage(imageBitmap:BitmapData):void
 		{
 			if (this.selectedForegroundImage != null) {
@@ -136,6 +143,16 @@
 			}
 			this.selectedForegroundImage = new Bitmap(imageBitmap);
 			this.selectedForeground.addChild(this.selectedForegroundImage);
+		}
+		
+		public function setBackgroundImage(imageBitmap:BitmapData):void
+		{
+			if (this.selectedBackgroundImage != null) {
+				this.selectedBackground.removeChild(this.selectedBackgroundImage);
+				this.selectedBackgroundImage = null;
+			}
+			this.selectedBackgroundImage = new Bitmap(imageBitmap);
+			this.selectedBackground.addChild(this.selectedBackgroundImage);
 		}
 		
 		function browseButtonDidClicked(e:MouseEvent):void
@@ -158,6 +175,10 @@
 		{
 			if (! this.enabled) {
 				return;
+			}
+			if (this.selectedBackgroundImage != null) {
+				this.selectedBackground.removeChild(this.selectedBackgroundImage);
+				this.selectedBackgroundImage = null;
 			}
 			this.delegate.selectColorButtonClicked();
 		}

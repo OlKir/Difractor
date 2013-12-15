@@ -101,6 +101,10 @@
 				this.setArtworkNameFor(this.selectedPhotoId);
 				this.delegate.setForegroundImage(this.selectedPhotoId);
 			}
+			if (this.controlsView.pointInBackgroundControl(targetPoint)) {
+				this.controlsView.setBackgroundImage(this.selectedPhoto.bitmapData);
+				this.delegate.setBackgroundImage(this.selectedPhotoId);
+			}
 			this.selectedPhoto = null;
 			this.selectedPhotoCursor = null;
 		}

@@ -14,12 +14,15 @@
 		public static const NOT_DEFINED:int = -1;
 		public static const FULL_IMAGE_ACCEPTED = "FULL_IMAGE_ACCEPTED";
 		
+		var imageLibrary:ImageLibrary;
+		
 		var canvasView:Sprite;
 		var maskView:Sprite;
 		
 		var backgroundView:Sprite;
 		var backgroundViewColor:Shape;
-		var imageLibrary:ImageLibrary;
+		var backgroundImage:Bitmap;
+		var backgroundImageId:int;
 		
 		var foregroundView:Sprite;
 		var foregroundImage:Bitmap;
@@ -47,6 +50,7 @@
 			this.canvasView.addChild(this.backgroundView);
 			this.backgroundViewColor = new Shape();
 			this.backgroundView.addChild(this.backgroundViewColor);
+			this.backgroundImageId = CanvasViewController.NOT_DEFINED;
 			
 			this.foregroundView = new Sprite();
 			this.foregroundImageId = CanvasViewController.NOT_DEFINED;
@@ -79,16 +83,36 @@
 		
 		function placeFullImage(e:Event):void
 		{
-			this.foregroundImageSourceBitmap = this.imageLibrary.getFullImageById(this.foregroundImageId);
-			if (this.foregroundImageSourceBitmap == null) {
-				return;
+			this.clearImages();
+			
+			if (this.foregroundImageId != CanvasViewController.NOT_DEFINED) {
+				this.foregroundImageSourceBitmap = this.imageLibrary.getFullImageById(this.foregroundImageId);
+				this.foregroundImage = new Bitmap(this.foregroundImageSourceBitmap.clone());
+				this.foregroundView.addChild(this.foregroundImage);
+				dispatchEvent(new Event(CanvasViewController.FULL_IMAGE_ACCEPTED));
 			}
-			this.foregroundImage = new Bitmap(this.foregroundImageSourceBitmap.clone());
-			this.foregroundView.addChild(this.foregroundImage);
-			dispatchEvent(new Event(CanvasViewController.FULL_IMAGE_ACCEPTED));
+			
+			if (this.backgroundImageId != CanvasViewController.NOT_DEFINED) {
+				var backgroundBitmap:BitmapData = this.imageLibrary.getFullImageById(this.backgroundImageId);
+				this.backgroundImage = new Bitmap(backgroundBitmap.clone());
+				this.backgroundView.addChild(this.backgroundImage);
+			}
+			
 			this.updateHorisontalSlices();
 			this.updateScale();
 			this.updateBackgroundColor();
+		}
+		
+		function clearImages():void
+		{
+			if (this.foregroundImage != null) {
+				this.foregroundView.removeChild(this.foregroundImage);
+				this.foregroundImage = null;
+			}
+			if (this.backgroundImage != null) {
+				this.backgroundView.removeChild(this.backgroundImage);
+				this.backgroundImage = null;
+			}
 		}
 		
 		function updateHorisontalSlices():void
@@ -119,15 +143,31 @@
 		
 		function updateScale():void
 		{
+			var oldWidth:Number = 0;
+			var oldHeight:Number = 0;
 			if (! this.scaleRelative) {
-				this.foregroundImage.scaleX = 1.0;
-				this.foregroundImage.scaleY = 1.0;
+				if (this.foregroundImage) {
+					this.foregroundImage.scaleX = 1.0;
+					this.foregroundImage.scaleY = 1.0;
+				}
+				if (this.backgroundImage) {
+					this.backgroundImage.scaleX = 1.0;
+					this.backgroundImage.scaleY = 1.0;
+				}
 				return;
 			}
-			var oldWidth:Number = this.foregroundImage.width;
-			var oldHeight:Number = this.foregroundImage.height;
-			this.foregroundImage.width = this.maskView.width;
-			this.foregroundImage.height = oldHeight * this.foregroundImage.width / oldWidth;
+			if (this.foregroundImage) {
+				oldWidth = this.foregroundImage.width;
+				oldHeight = this.foregroundImage.height;
+				this.foregroundImage.width = this.maskView.width;
+				this.foregroundImage.height = oldHeight * this.foregroundImage.width / oldWidth;
+			}
+			if (this.backgroundImage) {
+				oldWidth = this.backgroundImage.width;
+				oldHeight = this.backgroundImage.height;
+				this.backgroundImage.width = this.maskView.width;
+				this.backgroundImage.height = oldHeight * this.backgroundImage.width / oldWidth;
+			}
 			this.updateBackgroundColor();
 		}
 		
@@ -145,23 +185,49 @@
 		public function setBackgroundColor(color:uint):void
 		{
 			this.backgroundImageColor = color;
+			if (this.backgroundImage != null) {
+				this.backgroundView.removeChild(this.backgroundImage);
+				this.backgroundImage = null;
+				this.backgroundImageId = CanvasViewController.NOT_DEFINED;
+			}
+			
 			this.updateBackgroundColor();
 		}
 		
 		public function setForegroundImage(objectId:int):void
 		{
-			if (this.foregroundImage != null) {
-				this.foregroundView.removeChild(this.foregroundImage);
-				this.foregroundImage = null;
+			if (objectId == this.backgroundImageId) {
+				this.foregroundImageId = objectId;
+				this.placeFullImage(null);
+				return;
 			}
 			
 			var oldId:int = CanvasViewController.NOT_DEFINED;
 			if (this.foregroundImageId != CanvasViewController.NOT_DEFINED) {
 				oldId = this.foregroundImageId;
 			}
+
 			this.foregroundImageId = objectId;
 			this.imageLibrary.loadFullImageById(this.foregroundImageId,oldId);
 		}
+		
+		public function setBackgroundImage(objectId:int):void
+		{
+			if (objectId == this.foregroundImageId) {
+				this.backgroundImageId = objectId;
+				this.placeFullImage(null);
+				return;
+			}
+			
+			var oldId:int = CanvasViewController.NOT_DEFINED;
+			if (this.backgroundImageId != CanvasViewController.NOT_DEFINED) {
+				oldId = this.backgroundImageId;
+			}
+
+			this.backgroundImageId = objectId;
+			this.imageLibrary.loadFullImageById(this.backgroundImageId,oldId);
+		}
+		
 		
 		public function setRelativeScale(relative:Boolean):void
 		{
@@ -172,8 +238,14 @@
 		
 		public function saveCurrentImageWithName(imageName:String):void
 		{
-			this.foregroundImage.scaleX = 1.0;
-			this.foregroundImage.scaleY = 1.0;
+			if (this.foregroundImage) {
+				this.foregroundImage.scaleX = 1.0;
+				this.foregroundImage.scaleY = 1.0;
+			}
+			if (this.backgroundImage) {
+				this.backgroundImage.scaleX = 1.0;
+				this.backgroundImage.scaleY = 1.0;
+			}
 			this.canvasView.mask = null;
 			this.updateBackgroundColor();
 			
