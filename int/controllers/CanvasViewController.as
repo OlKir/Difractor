@@ -31,6 +31,7 @@
 		var foregroundImageSourceBitmap:BitmapData;
 		
 		var scaleRelative:Boolean;
+		var alterationEnabled:Boolean;
 		
 		var horisontalOffset:int;
 		var horisontalWidth:int;
@@ -61,6 +62,7 @@
 			this.horisontalStep = CanvasViewController.NOT_DEFINED;
 			
 			this.scaleRelative = false;
+			this.alterationEnabled = false;
 		}
 		
 		public function setCanvasMask(maskRectangle:Rectangle):void
@@ -117,29 +119,92 @@
 		
 		function updateHorisontalSlices():void
 		{
-			if (this.horisontalOffset == CanvasViewController.NOT_DEFINED || this.horisontalWidth == CanvasViewController.NOT_DEFINED || this.horisontalStep == CanvasViewController.NOT_DEFINED) {
+			if ( ! this.foregroundImageSourceBitmap) {
+				return;
+			}
+			
+			if (this.isDefaultSliceValues()) {
 				this.foregroundImage.bitmapData = this.foregroundImageSourceBitmap.clone();				
 				return;
 			}
+			if (this.alterationEnabled) {
+				this.createAlteratedImage();
+				return;
+			}
+			this.createMixedImage();
+		}
+		
+		function isDefaultSliceValues():Boolean
+		{
+			if ( this.horisontalWidth == CanvasViewController.NOT_DEFINED) {
+				return true;
+			}
+			if ( this.horisontalStep == CanvasViewController.NOT_DEFINED) {
+				return true;
+			}			
+			
+			return false;
+		}
+		
+		function createAlteratedImage():void
+		{
+			var imageRectangle:Rectangle = new Rectangle(0,0,this.foregroundImageSourceBitmap.width,this.foregroundImageSourceBitmap.height);
+			var backgroundImageSourceBitmap:BitmapData = new BitmapData(imageRectangle.width * 2,imageRectangle.height,false,backgroundImageColor); 
+			if (this.backgroundImage) {
+				backgroundImageSourceBitmap = this.backgroundImage.bitmapData;
+				this.backgroundImage.visible = false;
+			}
+			
+			var foregroundImageBitmap:BitmapData = new BitmapData(imageRectangle.width * 2,imageRectangle.height,true,0x00ffffff);
+			
+			var slicesNumber:int = Math.ceil(imageRectangle.width / this.horisontalWidth);
+			var sliceRectangle:Rectangle;
+			var destinationPoint:Point = null;
+			for (var i:int = 0; i < slicesNumber; i++) {
+				// Copying slice from foreground image
+				sliceRectangle = new Rectangle(i * this.horisontalWidth,0,this.horisontalWidth,foregroundImageBitmap.height);
+				destinationPoint = new Point(i *(this.horisontalWidth + this.horisontalStep),0.0);
+				foregroundImageBitmap.copyPixels(this.foregroundImageSourceBitmap,sliceRectangle,destinationPoint);
+				
+				// Copying slice from background image 
+				sliceRectangle = new Rectangle(i * this.horisontalStep,0,this.horisontalStep,foregroundImageBitmap.height);
+				destinationPoint = new Point(i *(this.horisontalWidth + this.horisontalStep) + this.horisontalWidth,0.0);
+				foregroundImageBitmap.copyPixels(backgroundImageSourceBitmap,sliceRectangle,destinationPoint);
+			}
+			this.setBitmapToForegroundImage(foregroundImageBitmap);
+		}
+		
+		function createMixedImage():void
+		{
+			if (this.backgroundImage) {
+				this.backgroundImage.visible = true;
+			}
+			
 			var imageRectangle:Rectangle = new Rectangle(0,0,this.foregroundImageSourceBitmap.width,this.foregroundImageSourceBitmap.height);
 			var foregroundImageBitmap:BitmapData = new BitmapData(imageRectangle.width,imageRectangle.height,true,0x00ffffff);
 			foregroundImageBitmap.copyPixels(this.foregroundImageSourceBitmap,imageRectangle,new Point(0,0));
 			
-			var slicesNumber:int = Math.ceil((imageRectangle.width - this.horisontalOffset)/(this.horisontalWidth + this.horisontalStep));
+			var slicesNumber:int = Math.ceil(imageRectangle.width /(this.horisontalWidth + this.horisontalStep));
 			var sliceRectangle:Rectangle;
 			for (var i:int = 0; i < slicesNumber; i++) {
-				sliceRectangle = new Rectangle(this.horisontalOffset + (this.horisontalWidth + this.horisontalStep) * i,0,this.horisontalWidth,foregroundImageBitmap.height);
+				sliceRectangle = new Rectangle((this.horisontalWidth + this.horisontalStep) * i,0,this.horisontalWidth,foregroundImageBitmap.height);
 				foregroundImageBitmap.fillRect(sliceRectangle,0x00000000);
 			}
+			this.setBitmapToForegroundImage(foregroundImageBitmap);
+		}
+		
+		function setBitmapToForegroundImage(imageBitmap:BitmapData):void
+		{
 			this.foregroundView.removeChild(this.foregroundImage);
 			this.foregroundImage.bitmapData.dispose();
 			this.foregroundImage = null;
 			
-			this.foregroundImage = new Bitmap(foregroundImageBitmap,"auto",true);
+			this.foregroundImage = new Bitmap(imageBitmap,"auto",true);
 			this.foregroundView.addChild(this.foregroundImage);
 			
 			this.updateScale();
 		}
+		
 		
 		function updateScale():void
 		{
@@ -182,6 +247,12 @@
 			this.updateHorisontalSlices();
 		}
 		
+		public function applyAlteration(alteration:Boolean):void
+		{
+			this.alterationEnabled = alteration;
+			this.updateHorisontalSlices();
+		}
+		
 		public function setBackgroundColor(color:uint):void
 		{
 			this.backgroundImageColor = color;
@@ -190,12 +261,19 @@
 				this.backgroundImage = null;
 				this.backgroundImageId = CanvasViewController.NOT_DEFINED;
 			}
+			if (this.alterationEnabled) {
+				this.updateHorisontalSlices();
+			}
 			
 			this.updateBackgroundColor();
 		}
 		
 		public function setForegroundImage(objectId:int):void
 		{
+			if (objectId == this.foregroundImageId) {
+				return;
+			}
+			
 			if (objectId == this.backgroundImageId) {
 				this.foregroundImageId = objectId;
 				this.placeFullImage(null);
@@ -206,6 +284,9 @@
 			if (this.foregroundImageId != CanvasViewController.NOT_DEFINED) {
 				oldId = this.foregroundImageId;
 			}
+			if (this.backgroundImageId == oldId) {
+				oldId = CanvasViewController.NOT_DEFINED;
+			}
 
 			this.foregroundImageId = objectId;
 			this.imageLibrary.loadFullImageById(this.foregroundImageId,oldId);
@@ -213,6 +294,10 @@
 		
 		public function setBackgroundImage(objectId:int):void
 		{
+			if (objectId == this.backgroundImageId) {
+				return;
+			}
+			
 			if (objectId == this.foregroundImageId) {
 				this.backgroundImageId = objectId;
 				this.placeFullImage(null);
@@ -222,6 +307,9 @@
 			var oldId:int = CanvasViewController.NOT_DEFINED;
 			if (this.backgroundImageId != CanvasViewController.NOT_DEFINED) {
 				oldId = this.backgroundImageId;
+			}
+			if (this.foregroundImageId == oldId) {
+				oldId = CanvasViewController.NOT_DEFINED;
 			}
 
 			this.backgroundImageId = objectId;

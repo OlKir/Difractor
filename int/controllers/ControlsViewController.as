@@ -185,6 +185,11 @@
 			this.delegate.saveCurrentImageWithName(imageName);
 		}
 		
+		public function changeAlterationTo(alteration:Boolean):void
+		{
+			this.delegate.applyAlteration(alteration);
+		}
+		
 		// ColorPickerView delegate methods
 		
 		public function pickerViewClosed():void

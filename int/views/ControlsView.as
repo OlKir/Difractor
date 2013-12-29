@@ -14,6 +14,7 @@
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.events.Event;
+	import fl.controls.CheckBox;
 
 	public class ControlsView extends Sprite {
 		
@@ -28,6 +29,8 @@
 		// GUI elements
 		var currentScaleRB:RadioButton;
 		var realScaleRB:RadioButton;
+		
+		var alterationMark:CheckBox;
 		
 		var horOffset:TextInput;
 		var horWidth:TextInput;
@@ -69,7 +72,9 @@
 			this.applyHorisontalBTN = this.getChildByName("apply_horisontal_btn_") as Button;
 			this.applyHorisontalBTN.addEventListener(MouseEvent.CLICK,applyHorisontalSlices);
 			this.applyVerticalBTN = this.getChildByName("apply_vertical_btn_") as Button;
-
+			
+			this.alterationMark = this.getChildByName("alteration_chk_") as CheckBox;
+			
 			this.selectColorBTN = this.getChildByName("select_color_btn_") as Sprite;
 			this.selectColorBTN.addEventListener(MouseEvent.CLICK,selectColorButtonDidClicked);
 			this.selectedForeground = this.getChildByName("selected_foreground_") as Sprite;
@@ -91,7 +96,9 @@
 			this.libraryGrid.addEventListener(ListEvent.ITEM_ROLL_OVER,preselectPhoto);
 			this.libraryGrid.addEventListener(MouseEvent.MOUSE_DOWN,selectPhoto);
 			
-			this.imageControls = new <UIComponent>[this.currentScaleRB,this.realScaleRB,this.applyHorisontalBTN,this.saveImageBTN];
+			this.alterationMark.addEventListener(Event.CHANGE,changeAlteration);
+			
+			this.imageControls = new <UIComponent>[this.currentScaleRB,this.realScaleRB,this.applyHorisontalBTN,this.saveImageBTN,this.alterationMark];
 			
 			this.enabled = true;
 		}
@@ -216,6 +223,11 @@
 		function saveImagePressed(e:MouseEvent):void
 		{
 			this.delegate.saveImage(this.fileName.text);
+		}
+		
+		function changeAlteration(e:Event):void
+		{
+			this.delegate.changeAlterationTo(this.alterationMark.selected);
 		}
 
 	}
